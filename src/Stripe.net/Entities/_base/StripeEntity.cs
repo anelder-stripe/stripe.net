@@ -10,11 +10,9 @@ namespace Stripe
     using Stripe.Infrastructure;
 
     [JsonObject(MemberSerialization.OptIn)]
+    [JsonConverter(typeof(StripeEntityConverter))]
     public abstract class StripeEntity : IStripeEntity
     {
-        [JsonIgnore]
-        private JObject rawJObject;
-
         /// <summary>
         /// Gets the raw <see cref="JObject">JObject</see> exposed by the Newtonsoft.Json library.
         /// This can be used to access properties that are not directly exposed by Stripe's .NET
@@ -27,29 +25,7 @@ namespace Stripe
         /// </remarks>
         /// <returns>The raw <see cref="JObject">JObject</see>.</returns>
         [JsonIgnore]
-        public JObject RawJObject
-        {
-            get
-            {
-                // Lazily initialize the object the first time the getter is called.
-                if (this.rawJObject == null)
-                {
-                    if (this.StripeResponse == null)
-                    {
-                        return null;
-                    }
-
-                    this.rawJObject = JObject.Parse(this.StripeResponse.Content);
-                }
-
-                return this.rawJObject;
-            }
-
-            protected set
-            {
-                this.rawJObject = value;
-            }
-        }
+        public JObject RawJObject { get; set; }
 
         [JsonIgnore]
         public StripeResponse StripeResponse { get; set; }
